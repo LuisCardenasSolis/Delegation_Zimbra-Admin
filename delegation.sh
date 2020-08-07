@@ -12,61 +12,84 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 basic(){
-$ZMPROV ma $ACCOUNT zimbraIsDelegatedAdminAccount TRUE
-$ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
-
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAccount
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAlias
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createCalendarResource
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +createDistributionList
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +deleteAlias
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +listDomain
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +domainAdminRights
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraAccountStatus
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.sn
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.displayName
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraPasswordMustChange
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +deleteAccount
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountInfo
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountMembership
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +getMailboxInfo
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +listAccount
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +removeAccountAlias
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +renameAccount
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +setAccountPassword
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +viewAccountAdminUI
+  $ZMPROV ma $ACCOUNT zimbraIsDelegatedAdminAccount TRUE
+  $ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents accountListView
 }
 
+accountDelegation(){
+  $ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAccount
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAlias
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createCalendarResource
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createDistributionList
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +deleteAlias
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +listDomain
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +domainAdminRights
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraAccountStatus
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.sn
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.displayName
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraPasswordMustChange
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +deleteAccount
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountInfo
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountMembership
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getMailboxInfo
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +listAccount
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +removeAccountAlias
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +renameAccount
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +setAccountPassword
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +viewAccountAdminUI
+  }
+
+onlyChangePassword(){
+  $ZMPROV grr global usr ${1} +listAccount
+  $ZMPROV grr global usr ${1} +getAccountInfo
+  $ZMPROV grr global usr ${1} +set.account.zimbraPasswordMustChange
+  $ZMPROV grr global usr ${1} +setAccountPassword
+  $ZMPROV grr global usr ${1} get.account.displayName
+  $ZMPROV grr global usr ${1} get.account.zimbraAccountStatus
+  $ZMPROV grr global usr ${1} get.account.description
+}
+#====================================================================
 viewMailAccount(){
-$ZMPROV grr global usr $ACCOUNT +listZimlet
-$ZMPROV grr global usr $ACCOUNT +modifyZimlet
-$ZMPROV grr global usr $ACCOUNT +adminLoginAs
+  $ZMPROV grr global usr $ACCOUNT +listZimlet
+  $ZMPROV grr global usr $ACCOUNT +modifyZimlet
+  $ZMPROV grr global usr $ACCOUNT +adminLoginAs
 }
 viewDomainQuotaUsage(){
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT +getDomainQuotaUsage
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT +getDomainQuotaUsage
 }
 viewAllMailQueue(){
-$ZMPROV grr global usr $ACCOUNT +adminConsoleMailQueueRights
+  $ZMPROV grr global usr $ACCOUNT +adminConsoleMailQueueRights
 }
 configQuotaAccount(){
-$ZMPROV ma $ACCOUNT zimbraDomainAdminMaxMailQuota 0
-$ZMPROV grr account $ACCOUNT usr $ACCOUNT +configureQuota
+  $ZMPROV ma $ACCOUNT zimbraDomainAdminMaxMailQuota 0
+  $ZMPROV grr account $ACCOUNT usr $ACCOUNT +configureQuota
 }
 notManageZimletsAccount(){
-$ZMPROV grr global usr $ACCOUNT -adminConsoleZimletRights
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT -setAdminConsoleAccountsZimletsTab
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewDomainAdminConsoleAccountsZimletsTab
-$ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewAdminConsoleDomainZimletsTab
+  $ZMPROV grr global usr $ACCOUNT -adminConsoleZimletRights
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -setAdminConsoleAccountsZimletsTab
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewDomainAdminConsoleAccountsZimletsTab
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -viewAdminConsoleDomainZimletsTab
+}
+
+#======================
+accountAdvancedPermissions(){
+  accountDelegation
+  viewMailAccount
+  viewDomainQuotaUsage
+  notManageZimletsAccount
+  #viewAllMailQueue
+  #configQuotaAccount
 }
 
 #=======================
 main(){
 basic
-viewMailAccount
-viewDomainQuotaUsage
-notManageZimletsAccount
-#viewAllMailQueue
-#configQuotaAccount
+
+#1 ------
+accountAdvancedPermissions
+#2 ------------
+#onlyChangePassword
 }
 
 #=======================
