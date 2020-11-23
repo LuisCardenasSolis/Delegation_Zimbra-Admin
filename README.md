@@ -6,6 +6,13 @@ Script para delegar permisos de administrador a una cuenta estándar
 - https://github.com/Zimbra/adminguide/blob/master/delegatedadmin.adoc#manage-zimlets
 - zmprov gar -c ALL
 
+
+### [Ver permisos](https://wiki.zimbra.com/wiki/UmaT-Implementing-Delegated-Administration)
+~~~
+zmprov gg -g usr admin@domain.com | grep ^global | awk '{print $1,$3,$5,$6}'
+zmprov gg -g usr admin@domain.com | grep ^domain | awk '{print $1,$3,$4,$6,$7}'
+~~~
+
 ## Ejecucion
 ~~~
 ./delegation.sh param1 param2
