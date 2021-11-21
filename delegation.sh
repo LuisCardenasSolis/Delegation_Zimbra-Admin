@@ -13,11 +13,8 @@ fi
 
 basic(){
   $ZMPROV ma $ACCOUNT zimbraIsDelegatedAdminAccount TRUE
-  $ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents accountListView
-}
+  $ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView zimbraAdminConsoleUIComponents aliasListView zimbraAdminConsoleUIComponents resourceListView zimbraAdminConsoleUIComponents domainListView
 
-accountDelegation(){
-  $ZMPROV ma $ACCOUNT zimbraAdminConsoleUIComponents cartBlancheUI zimbraAdminConsoleUIComponents domainListView zimbraAdminConsoleUIComponents accountListView zimbraAdminConsoleUIComponents DLListView
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAccount
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createAlias
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT +createCalendarResource
@@ -29,6 +26,11 @@ accountDelegation(){
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.sn
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.displayName
   $ZMPROV grr domain $DOMAIN usr $ACCOUNT set.account.zimbraPasswordMustChange
+
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.account.zimbraMailQuota
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.account.zimbraCOSId
+  $ZMPROV grr domain $DOMAIN usr $ACCOUNT -set.domain.zimbraDomainDefaultCOSId
+
   $ZMPROV grr account $ACCOUNT usr $ACCOUNT +deleteAccount
   $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountInfo
   $ZMPROV grr account $ACCOUNT usr $ACCOUNT +getAccountMembership
